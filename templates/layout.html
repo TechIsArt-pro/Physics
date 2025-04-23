@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>       
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+        <meta charset="utf-8">  
+        <meta name="viewport" content="initial-scale=1, width=device-width">      
+        <title>ChemLab50: {% block title %}{% endblock %}</title>
+    </head>
+    <body>
+
+        <ul style="text-align: center;" height="200">
+            <li class="left"><img src="{{ url_for('static', filename='phillip.jpg') }}" alt="logo" width="500" height="500"></li> <!-- logo made with canva -->
+            <li ><h1> Δυναμικές Γραμμές Μεταξύ Δύο Φορτίων </h1></li>   
+        </ul>
+        {% block main %}{% endblock %}
+
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </body>  
+</html>

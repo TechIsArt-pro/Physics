@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+    <title>Interactive Electric Field Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+    <style>
+        input[type="range"], input[type="number"] {
+            width: 300px;
+            margin: 10px;
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 5px;
+            margin: 5px;
+        }
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        .output {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<ul style="text-align: center;">
+    <li class="left"><img src="{{ url_for('static', filename='phillip.jpg') }}" alt="logo" width="200" height="200"></li> <!-- logo made with canva -->
+    <li ><h1> Δυναμικές Γραμμές Μεταξύ Δύο Φορτίων </h1></li>   
+</ul>
+
+    <form id="charge-form">
+
+        <div class="slider-container">
+            <label for="charge1">Φορτίο 1 (σε C): </label>
+            <input type="range" id="charge1" name="charge1" min="-10" max="10" step="0.1" value="{{ charge1 }}">
+            <input type="number" id="charge1_value" name="charge1" value="{{ charge1 }}" step="any">
+        </div>
+
+        <div class="slider-container">
+            <label for="charge2">Φορτίο 2 (σε C): </label>
+            <input type="range" id="charge2" name="charge2" min="-10" max="10" step="0.1" value="{{ charge2 }}">
+            <input type="number" id="charge2_value" name="charge2" value="{{ charge2 }}" step="any">
+        </div>
+
+        <div class="slider-container">
+            <label for="distance">Απόσταση μεταξύ φορτίων (σε m): </label>
+            <input type="range" id="distance" name="distance" min="0.1" max="5" step="0.1" value="{{ distance }}">
+            <input type="number" id="distance_value" name="distance" value="{{ distance }}" step="any">
+        </div>
+    </form>
+
+    <div class="output">
+        <img id="field-plot" src="data:image/png;base64,{{ image_data }}" alt="Electric Field Plot" />
+    </div>
+
+    <script>
+        // Sync sliders and number inputs
+        document.querySelectorAll('input[type="range"]').forEach(function(slider) {
+            slider.oninput = function() {
+                let numInput = document.getElementById(slider.id + "_value");
+                numInput.value = slider.value;
+                if (slider.value == 0) {
+                    window.alert("Ουδέτερο φορτίο");
+                }
+                updatePlot();  // Trigger AJAX request
+            }
+        });
+
+        document.querySelectorAll('input[type="number"]').forEach(function(numberInput) {
+            numberInput.oninput = function() {
+                let slider = document.getElementById(numberInput.id.replace("_value", ""));
+                slider.value = numberInput.value;
+                if (slider.value == 0) {
+                    window.alert("Ουδέτερο φορτίο δεν εμαφανίζει δυναμικές γραμμές");
+                }
+                updatePlot();  // Trigger AJAX request
+            }
+        });
+
+        // AJAX request to update the electric field plot
+        function updatePlot() {
+            var formData = new FormData(document.getElementById("charge-form"));
+            fetch("/update", {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  document.getElementById("field-plot").src = "data:image/png;base64," + data.image_data;
+              });
+        }
+    </script>
+</body>
+</html>
